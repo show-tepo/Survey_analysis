@@ -173,17 +173,23 @@ if uploaded_file is not None:
         # ネットワークの作成
         G = nx.Graph()
         for (word1, word2), weight in cooccurrence_count.items():
+            # 閾値を適用
             if weight >= weight_threshold:
                 G.add_edge(word1, word2, weight=weight)
 
+        # ノードが存在しない場合は空のグラフを返す
+        if G.number_of_nodes() == 0:
+            return go.Figure().update_layout(title="共起ネットワーク (エッジなし)", width=1200, height=800)
+
         # レイアウトの選択
         if layout_option.startswith("spring"):
-            pos = nx.spring_layout(G, seed=42, k=spring_k, iterations=50)
+            pos = nx.spring_layout(G, seed=42, k=st.session_state["spring_k"], iterations=50)
         elif layout_option.startswith("circular"):
             pos = nx.circular_layout(G)
         elif layout_option.startswith("random"):
             pos = nx.random_layout(G)
 
+        # ノードとエッジの座標を計算
         x_nodes = [pos[node][0] for node in G.nodes()]
         y_nodes = [pos[node][1] for node in G.nodes()]
         edge_x = []
@@ -194,12 +200,15 @@ if uploaded_file is not None:
             edge_x.extend([x0, x1, None])
             edge_y.extend([y0, y1, None])
 
+        # ノードサイズを計算
         node_sizes = [G.degree(node, weight="weight") * node_size_multiplier for node in G.nodes()]
 
+        # エッジトレース
         edge_trace = go.Scatter(
             x=edge_x, y=edge_y, line=dict(width=0.5, color="#888"), hoverinfo="none", mode="lines"
         )
 
+        # ノードトレース
         node_trace = go.Scatter(
             x=x_nodes,
             y=y_nodes,
@@ -220,6 +229,7 @@ if uploaded_file is not None:
             height=800,
         )
         return fig
+
 
     # 出現頻度分析
     st.subheader("出現頻度分析")
