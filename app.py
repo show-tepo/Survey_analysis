@@ -138,12 +138,15 @@ if uploaded_file is not None:
 
         # 指定された品詞を抽出
         def extract_keywords(text):
+            if not isinstance(text, str):  # 文字列でない場合は空リストを返す
+                return []
             words = []
             for token in tokenizer.tokenize(text):
                 if any(token.part_of_speech.startswith(pos) for pos in selected_pos) and token.surface not in stopwords:
                     words.append(token.surface)
             # n-gramを生成
             return [" ".join(words[i:i + ngram]) for i in range(len(words) - ngram + 1)]
+
 
         # キーワードの抽出
         df["keywords"] = df[column].apply(extract_keywords)
