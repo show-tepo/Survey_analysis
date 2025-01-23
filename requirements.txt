@@ -4,3 +4,5 @@ networkx
 plotly
 janome
 chardet
+wordcloud
+matplotlib
