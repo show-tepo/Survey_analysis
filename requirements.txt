@@ -6,3 +6,4 @@ janome
 chardet
 wordcloud
 matplotlib
+scipy
